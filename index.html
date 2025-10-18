@@ -3,30 +3,57 @@
 
 <head>
     <meta charset="UTF-8">
+    <!-- Make the page scale correctly on phones -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Random Color Change V1</title>
+    <!-- Add a description for search engines -->
+    <meta name="description" content="Diwali Lights - A simple web app to create colorful boxes.">
+    <!-- Add keywords for search engines -->
+    <meta name="keywords" content="random, color, change, boxes, web app">
+    <!-- Add author for search engines -->
+    <meta name="author" content="Biplab Sharma, Tech VFX King">
+    <title>Diwali Lights</title>
+    <!-- Link to the Tab bar Icon. -->
+    <link rel="shortcut icon" href="./rgb.png" type="image/x-icon">
+    <!-- Link to the stylesheet. This file contains all page styling. -->
     <link rel="stylesheet" href="./styles.css">
 </head>
 
 <body>
+    <!-- Main area: everything on the page is inside this <main> -->
     <main class="container flex-col">
+
+        <!-- Input card: the user types the number of boxes and the timer here -->
         <section class="input-container flex-col">
+            <!-- Label tells the user what to type. Not linked to input for simplicity. -->
             <label>Enter Box Count</label>
+            <!-- Input for how many boxes to create. Use numbers only. -->
             <input id="inp1" type="number" inputmode="numeric" />
+
+            <!-- Label for timer input (seconds between color changes). -->
             <label>Enter Timner Count</label>
             <input id="inp2" type="number" inputmode="numeric">
+
+            <!-- Submit button triggers the script to create boxes. -->
             <button id="btn" type="button">Submit</button>
         </section>
+
+        <!-- Grid container: boxes are added here by scripts.js -->
         <section id="container-box-elem" class="container-box">
+            <!-- Initially empty. Script will add <div class="container-box-item"> elements here. -->
         </section>
+
+        <!-- Controls for starting/stopping the color animation -->
         <section class="color-change">
             <label>Change Color</label>
             <section class="flex-col">
+                <!-- Start and Stop buttons are wired in scripts.js -->
                 <button id="start" type="button">Start Light</button>
                 <button id="stop" type="button">Stop Light</button>
             </section>
         </section>
     </main>
+
+    <!-- Link to the JavaScript file that powers the interactions -->
     <script src="./scripts.js"></script>
 </body>
 
