@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Color Change V1</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+    <main class="container flex-col">
+        <section class="input-container flex-col">
+            <label>Enter Box Count</label>
+            <input id="inp1" type="number" inputmode="numeric" />
+            <label>Enter Timner Count</label>
+            <input id="inp2" type="number" inputmode="numeric">
+            <button id="btn" type="button">Submit</button>
+        </section>
+        <section id="container-box-elem" class="container-box">
+        </section>
+        <section class="color-change">
+            <label>Change Color</label>
+            <section class="flex-col">
+                <button id="start" type="button">Start Light</button>
+                <button id="stop" type="button">Stop Light</button>
+            </section>
+        </section>
+    </main>
+    <script src="./scripts.js"></script>
+</body>
+
+</html>
