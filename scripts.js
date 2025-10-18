@@ -31,6 +31,11 @@
 // We always clear these via clearAllIntervals() before creating new intervals.
 let intervalvalue = [];
 
+// Persistent color store for each logical tile index.
+// This ensures re-rendering the virtualized DOM (during scroll) reuses the
+// existing color for that logical item instead of generating a new random color.
+let colors = [];
+
 // id for a pending render timeout — used to avoid race conditions when user submits fast
 // When a user submits repeatedly we cancel the previous scheduled render to ensure
 // the most recent submit wins.
@@ -100,12 +105,11 @@ function renderVirtualGrid(boxCount) {
     const containerHeight = boxContainer.clientHeight || 400;
     virtualVisibleRows = Math.ceil(containerHeight / virtualBoxHeight) + virtualOverscan;
 
-    // Compute which tiles to render based on scroll position
-    const scrollTop = boxContainer.scrollTop;
-    const firstRow = Math.max(0, Math.floor(scrollTop / virtualBoxHeight) - virtualOverscan);
-    const lastRow = Math.min(Math.ceil(boxCount / virtualGridCols), firstRow + virtualVisibleRows);
-    const startIdx = firstRow * virtualGridCols;
-    const endIdx = Math.min(boxCount, lastRow * virtualGridCols);
+    // For now we always render all logical tiles (no virtualization).
+    // This creates `boxCount` DOM nodes. If performance becomes an issue,
+    // we can re-introduce virtualization or a hybrid mode later.
+    const startIdx = 0;
+    const endIdx = boxCount;
 
     // Remove previous children and create only the visible tile elements.
     // This keeps DOM size small and improves performance for large counts.
@@ -113,9 +117,14 @@ function renderVirtualGrid(boxCount) {
     for (let i = startIdx; i < endIdx; i++) {
         const div = document.createElement('div');
         div.className = 'container-box-item';
+        // Mark the DOM element with its logical index so interval handlers can
+        // update the correct logical tile even when DOM nodes are recycled.
+        div.dataset.index = String(i);
         // Simple label shown in the demo; in a real app this would be richer content.
-        div.textContent = `Div ${i + 1}`;
-        div.style.background = getRandomColor();
+        div.textContent = `Light ${i + 1}`;
+        // Reuse an existing color for this logical index if present, otherwise create one.
+        if (!colors[i]) colors[i] = getRandomColor();
+        div.style.background = colors[i];
         boxContainer.appendChild(div);
     }
 
@@ -231,9 +240,14 @@ function restartIntervals(intervalMs) {
     clearAllIntervals();
 
     // create new intervals for each current box element
-    for (let boxItem of boxContainer.children) {
+    // We create one interval per logical tile index (colors array length).
+    for (let i = 0; i < colors.length; i++) {
         const id = setInterval(function () {
-            boxItem.style.background = getRandomColor();
+            // update persistent color for this logical index
+            colors[i] = getRandomColor();
+            // reflect the new color on any currently rendered DOM node with this index
+            const dom = boxContainer.querySelector(`.container-box-item[data-index="${i}"]`);
+            if (dom) dom.style.background = colors[i];
         }, Math.max(100, intervalMs));
         intervalvalue.push(id);
     }
@@ -334,6 +348,17 @@ function addBoxItem(boxCount = 0) {
         return;
     }
 
+    // Ensure the persistent colors array is sized to the requested logical count.
+    // Preserve existing colors where possible so re-creating with a larger or smaller
+    // count keeps previous color history for indices that remain.
+    if (colors.length < boxCount) {
+        const oldLen = colors.length;
+        colors.length = boxCount;
+        for (let i = oldLen; i < boxCount; i++) colors[i] = getRandomColor();
+    } else if (colors.length > boxCount) {
+        colors.length = boxCount; // truncate extra colors
+    }
+
     // Skeleton shimmer for virtual grid
     const skeletons = [];
     virtualGridCols = getGridCols();
@@ -401,9 +426,15 @@ function onStartColor() {
     clearAllIntervals();
 
     // For each box element, create an independent interval that changes its background
-    for (let boxItem of boxContainer.children) {
+    // Create intervals for each logical tile index. When an interval fires it
+    // updates the persistent color (colors[i]) and then updates any DOM node
+    // currently representing that index. This prevents re-render on scroll
+    // from accidentally showing a different random color.
+    for (let i = 0; i < colors.length; i++) {
         const id = setInterval(function () {
-            boxItem.style.background = getRandomColor();
+            colors[i] = getRandomColor();
+            const dom = boxContainer.querySelector(`.container-box-item[data-index="${i}"]`);
+            if (dom) dom.style.background = colors[i];
         }, Math.max(100, currentNumber * 1000)); // convert seconds to ms, min 100ms
         intervalvalue.push(id); // remember id so we can clear it later
     }
