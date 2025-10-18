@@ -4,155 +4,839 @@
    Base & Reset styles
    ===================== */
 /* box-sizing: border-box makes width/padding easier to reason about */
-* { box-sizing: border-box; }
-html, body { height: 100%; }
-body{
-    margin: 0; /* remove default browser margin */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+
+    margin: 0;
+    /* remove default browser margin */
     /* Use a modern system font stack for better cross-platform rendering */
     font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    -webkit-font-smoothing: antialiased; /* nicer text on Apple devices */
+    -webkit-font-smoothing: antialiased;
+    /* nicer text on Apple devices */
     -moz-osx-font-smoothing: grayscale;
     /* subtle dark-blue gradient background for a modern look */
-    background: linear-gradient(180deg,#0f172a 0%, #071027 100%);
-    color: #0f172a; /* base text color (not heavily used because content is light on dark) */
+    background: linear-gradient(180deg, #0f172a 0%, #071027 100%);
+    color: #0f172a;
+    /* base text color (not heavily used because content is light on dark) */
 }
 
 
 /* =====================
    Layout container
    ===================== */
-.container{
-    min-height: 100dvh; /* full viewport height (device units) */
-    padding: 2rem 1rem;  /* space around page content */
+.container {
+    /* Make body a column flex so footer can be pushed to the bottom when content is short */
+    min-height: calc(100dvh - 0px);
+    /* use viewport height but allow footer placement */
+    padding: 2rem 1rem;
+    /* space around page content */
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;        /* space between child sections */
-    align-items: center; /* center horizontally */
+    gap: 1.25rem;
+    /* space between child sections */
+    align-items: center;
+    /* center horizontally */
+}
+
+/* ensure page root is flex so footer can stick to bottom when needed */
+
+html,
+body {
+    height: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    flex: 1 0 auto;
+    min-height: 0;
+}
+
+.site-footer {
+    flex-shrink: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.12);
+    padding: 1rem 0;
+    /* Remove margin-top to avoid double spacing */
+    margin-top: 0;
+    position: relative;
+}
+
+/* --------------------
+   Hero / branding block
+   -------------------- */
+.hero {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.hero-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.6);
+}
+
+.hero-text h1 {
+    margin: 0;
+    color: #e6eef8;
+    font-size: 1.4rem;
+    letter-spacing: 0.6px;
+}
+
+.hero-text .tagline {
+    margin: 0;
+    color: #cfe8ff;
+    opacity: 0.9;
+    font-size: 0.95rem;
 }
 
 
 /* =====================
    Controls card
    ===================== */
-.input-container{
+.input-container {
     width: 100%;
-    max-width: 980px; /* limit width on large screens */
-    background: rgba(255,255,255,0.06); /* translucent card */
-    border: 1px solid rgba(255,255,255,0.06);
+    max-width: 980px;
+    /* limit width on large screens */
+    background: rgba(255, 255, 255, 0.06);
+    /* translucent card */
+    border: 1px solid rgba(255, 255, 255, 0.06);
     padding: 1rem;
     border-radius: 12px;
     display: flex;
     gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap; /* allow inputs to wrap on small screens */
-    box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+    flex-wrap: wrap;
+    /* allow inputs to wrap on small screens */
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.5);
 }
 
 /* labels inside the input card use a light text color */
-.input-container label{ color: #e6eef8; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.input-container label {
+    color: #e6eef8;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
 
 /* remove default arrow controls on number inputs on some browsers */
-.input-container input[type=number]{
+.input-container input[type=number] {
     appearance: textfield;
     -moz-appearance: textfield;
 }
 
-.input-block{ display: flex; flex-direction: column; gap: 0.35rem; min-width: 140px; }
+.input-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 140px;
+}
 
 /* shared styles for inputs and buttons to keep UI consistent */
-input[type="number"], button{
+
+input[type="number"],
+button {
     padding: 0.6rem 0.75rem;
     border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.02);
     color: #e6eef8;
     outline: none;
     font-size: 0.95rem;
 }
 
-/* focus state for inputs (keyboard users) */
-input[type="number"]:focus{ box-shadow: 0 4px 12px rgba(2,6,23,0.5); border-color: rgba(99,102,241,0.9); }
+/* Play/Pause button styles placed next to Submit */
+.play-pause {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #ffffff; /* play state: white background */
+    cursor: pointer;
+}
 
-button{ cursor: pointer; transition: all 160ms ease-in-out; }
+.play-pause svg { display: block; }
+
+/* When playing (data-playing=true) show red background and white icon */
+.play-pause[data-playing="true"] {
+    background: #ef4444; /* red */
+    border-color: rgba(239,68,68,0.9);
+}
+.play-pause[data-playing="true"] #icon-play {
+    display: none !important;
+}
+.play-pause[data-playing="true"] #icon-pause {
+    display: block !important;
+}
+
+/* When not playing, show play icon in red on white bg */
+.play-pause[data-playing="false"] #icon-play {
+    display: block !important;
+}
+.play-pause[data-playing="false"] #icon-pause {
+    display: none !important;
+}
+
+input[type="range"] {
+    width: 100%;
+    max-width: 320px;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+    background: transparent;
+    appearance: none;
+    height: 2.5em;
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 8px;
+    background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%);
+    border-radius: 4px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #7c3aed;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.18);
+    transition: background 0.2s;
+    margin-top: -8px;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+    background: #e0e7ff;
+    border-color: #06b6d4;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #7c3aed;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.18);
+    transition: background 0.2s;
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+    background: #e0e7ff;
+    border-color: #06b6d4;
+}
+
+input[type="range"]::-ms-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #7c3aed;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.18);
+    transition: background 0.2s;
+}
+
+input[type="range"]:focus::-ms-thumb {
+    background: #e0e7ff;
+    border-color: #06b6d4;
+}
+
+input[type="range"]::-ms-fill-lower {
+    background: #7c3aed;
+    border-radius: 4px;
+}
+
+input[type="range"]::-ms-fill-upper {
+    background: #06b6d4;
+    border-radius: 4px;
+}
+
+input[type="range"]:focus {
+    outline: none;
+}
+
+input[type="range"]::-moz-range-track {
+    height: 8px;
+    background: linear-gradient(90deg, #7c3aed 0%, #06b6d4 100%);
+    border-radius: 4px;
+}
+
+input[type="range"]::-ms-tooltip {
+    display: none;
+}
+
+#timer-value {
+    font-size: 1.1em;
+    vertical-align: middle;
+}
+
+/* Windows-11-like loader for timer changes */
+.timer-loader {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    position: relative;
+    border-radius: 8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    box-shadow: 0 6px 20px rgba(2,6,23,0.5);
+    padding: 6px;
+    align-self: center;
+}
+
+.timer-loader::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    right: 6px;
+    bottom: 6px;
+    border-radius: 6px;
+    border: 3px solid rgba(124,58,237,0.08);
+    box-sizing: border-box;
+}
+
+.timer-loader::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #7c3aed;
+    transform-origin: 50% 14px;
+    animation: loader-rotate 0.9s linear infinite;
+}
+
+@keyframes loader-rotate {
+    0% { transform: rotate(0deg) translateY(0); }
+    50% { transform: rotate(180deg) translateY(0); }
+    100% { transform: rotate(360deg) translateY(0); }
+}
+
+/* focus state for inputs (keyboard users) */
+input[type="number"]:focus {
+    box-shadow: 0 4px 12px rgba(2, 6, 23, 0.5);
+    border-color: rgba(99, 102, 241, 0.9);
+}
+
+button {
+    cursor: pointer;
+    transition: all 160ms ease-in-out;
+}
 
 /* the submit button has a colorful gradient to look modern */
-button#btn{ background: linear-gradient(90deg,#7c3aed,#06b6d4); border: none; padding: 0.6rem 1rem; color: white; font-weight: 600; }
-button#btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.18); }
+button#btn {
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
+    border: none;
+    padding: 0.6rem 1rem;
+    color: white;
+    font-weight: 600;
+}
 
-.color-change{ width:100%; max-width:980px; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
-.color-change .flex-col{ flex-direction:row; gap:0.5rem; }
+button#btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.18);
+}
+
+.color-change {
+    width: 100%;
+    max-width: 980px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.color-change .flex-col {
+    flex-direction: row;
+    gap: 0.5rem;
+}
 
 /* Start/Stop buttons styling */
-button#start, button#stop{
-    background:#111827; color:#f8fafc; border:1px solid rgba(255,255,255,0.06); padding:0.6rem 0.8rem; border-radius:8px;
+button#start,
+button#stop {
+    background: #111827;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
 }
-button#start:hover{ box-shadow:0 8px 20px rgba(16,185,129,0.08); }
-button#stop{ background:#ef4444; }
+
+button#start:hover {
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.08);
+}
+
+button#stop {
+    background: #ef4444;
+}
 
 
 /* =====================
-   Grid of boxes
+   Grid of boxes (cleaned)
+   - Enforce vertical-only scrolling
+   - Use an explicit 6-column grid on large screens
+   - Scale down with media queries (no horizontal overflow)
    ===================== */
-.container-box{
-    width:100%;
-    max-width:1100px;
+.container-box {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
     display: grid;
     gap: 0.75rem;
-    /* Responsive columns: each column is at least 100px, and the grid fits as many as possible */
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    align-content: start;
-    padding: 1rem;
+    /* default to 6 equal columns on wide screens */
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 120px;
+    align-items: stretch;
+    justify-items: stretch;
     border-radius: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden; /* important: prevent horizontal scroll */
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed #181e2a;
+    padding: 0.5rem;
 }
 
-.container-box-item{
-    height: 120px;
-    border-radius: 10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color: rgba(255,255,255,0.95);
-    font-weight:700;
-    letter-spacing:0.3px;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.5);
-    transition: transform 180ms ease, box-shadow 180ms ease;
+/* Custom scrollbar for WebKit browsers */
+.container-box::-webkit-scrollbar {
+    width: 10px;
+    background: transparent;
+    border-radius: 8px;
 }
-.container-box-item:hover{ transform: translateY(-6px); box-shadow: 0 16px 36px rgba(2,6,23,0.6); }
+
+.container-box::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c3aed 0%, #06b6d4 100%);
+    border-radius: 8px;
+    min-height: 40px;
+}
+
+.container-box::-webkit-scrollbar-thumb:hover {
+    background: #5b21b6;
+}
+
+.container-box-item {
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    box-shadow: 0 6px 18px rgba(2, 6, 23, 0.5);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+    min-width: 0; /* allow grid to size items—avoid forcing a min width */
+    padding: 0.5rem;
+    overflow: hidden;
+}
+
+.container-box-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba(2, 6, 23, 0.6);
+}
+
+/* Make the tile content scale nicely on small devices */
+.container-box-item .label {
+    font-size: 0.95rem;
+    text-align: center;
+    word-break: break-word;
+}
 
 
 /* =====================
    Skeleton shimmer (placeholder while boxes render)
    ===================== */
-.skeleton{
+.skeleton {
     /* soft gradient for the base of the skeleton */
-    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 100%);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 100%);
     position: relative;
     overflow: hidden;
 }
-.skeleton::after{
+
+.skeleton::after {
     /* moving highlight to create shimmer effect */
     content: '';
     position: absolute;
-    left: -150px; top: 0; bottom: 0; width: 150px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    left: -150px;
+    top: 0;
+    bottom: 0;
+    width: 150px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
     animation: shimmer 1.1s linear infinite;
 }
-@keyframes shimmer{ 100%{ transform: translateX(300%); } }
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(300%);
+    }
+}
 
 
 /* Responsive tweaks: smaller devices get slightly smaller tiles and padding */
-@media (max-width:720px){
-    .input-container{ padding:0.75rem; gap:0.5rem; }
-    .container-box{ gap:0.5rem; padding:0.5rem; }
-    .container-box-item{ height:100px; }
+@media (max-width:1399px) {
+    .input-container {
+        padding: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    /* scale from 6 -> 5 columns */
+    .container-box {
+        grid-template-columns: repeat(5, 1fr);
+    }
 }
 
-@media (min-width:1400px){
-    .container{ padding:3rem 2rem; }
-    .container-box-item{ height:160px; }
+@media (max-width:1200px) {
+    /* 6 -> 4 columns */
+    .container-box {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width:900px) {
+    /* 4 -> 3 columns */
+    .container-box {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .container-box-item {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width:600px) {
+    /* 3 -> 2 columns */
+    .container-box {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width:420px) {
+    /* 2 -> 1 column (mobile) */
+    .container-box {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width:1400px) {
+    .container {
+        padding: 3rem 2rem;
+    }
+
+    .container-box-item {
+        height: 160px;
+    }
 }
 
 
 /* Visually hidden helper class for accessibility when needed */
-.visually-hidden{ position:absolute !important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px); white-space:nowrap; }
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+/* --------------------
+   Footer & share area
+   -------------------- */
+.site-footer {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.12);
+    padding: 1rem 0;
+    margin-top: 1.25rem;
+    position: relative;
+}
+
+.footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.site-footer .mission {
+    color: #e6eef8;
+    margin: 0;
+}
+
+.share-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.share-button {
+    background: rgba(255, 255, 255, 0.03);
+    color: #e6eef8;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.share-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.45rem 0.6rem;
+    min-width: 44px;
+    min-height: 44px;
+    line-height: 1;
+}
+
+/* Make share buttons show a short label next to the icon */
+.share-button .share-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e6eef8;
+    margin-right: 6px;
+    display: inline-block;
+}
+
+/* Slightly larger click area and horizontal layout for labeled share buttons */
+.share-button {
+    padding: 0.5rem 0.8rem;
+    min-width: 120px;
+    justify-content: flex-start;
+}
+
+/* GitHub credit styling */
+.github-link {
+    color: #7c3aed;
+    font-weight: 700;
+    text-decoration: none;
+}
+.github-link:hover {
+    text-decoration: underline;
+}
+.github-username {
+    vertical-align: middle;
+}
+
+/* Make the GitHub link a visible CTA */
+.credit .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.18);
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    color: #7c3aed;
+}
+
+.credit .github-link svg {
+    width: 16px;
+    height: 16px;
+    color: #7c3aed;
+}
+
+.credit .github-link:focus,
+.credit .github-link:hover {
+    background: rgba(124,58,237,0.18);
+    box-shadow: 0 6px 18px rgba(124,58,237,0.06);
+    text-decoration: none;
+}
+
+@media (max-width:560px) {
+    /* ensure the GitHub pill remains visible and doesn't wrap awkwardly */
+    .credit .github-link {
+        padding: 0.25rem 0.45rem;
+        font-size: 0.92rem;
+    }
+}
+
+.share-button svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    pointer-events: none;
+    transition: transform 0.15s cubic-bezier(.4, 0, .2, 1);
+}
+
+.share-button:hover {
+    transform: translateY(-2px) scale(1.07);
+    box-shadow: 0 8px 20px rgba(2, 6, 23, 0.5);
+}
+
+.share-button:active svg {
+    transform: scale(0.93);
+}
+
+.share-button .visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+.credit {
+    color: #cfe8ff;
+    opacity: 0.85;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+@media (max-width:720px) {
+    .hero {
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+
+    .footer-inner {
+        align-items: center;
+        text-align: center;
+    }
+}
+
+/* Footer responsive fixes to prevent overflow on small screens */
+@media (max-width:560px) {
+    .share-buttons {
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* hide the long "Share on ..." labels on very small screens to save width */
+    .share-button .share-text {
+        display: none;
+    }
+
+    .share-button {
+        min-width: 44px; /* allow compact circular buttons */
+        padding: 0.4rem;
+        justify-content: center;
+    }
+
+    .footer-inner {
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    .credit {
+        font-size: 0.9rem;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+}
+
+/* Accordion for step-by-step instructions inside the input card */
+.accordion {
+    width: 100%;
+    max-width: 980px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 8px 24px rgba(2,6,23,0.45);
+    margin-bottom: 0.5rem;
+}
+
+.accordion-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.8rem;
+    background: transparent;
+    border: none;
+    color: #e6eef8;
+    cursor: pointer;
+}
+
+.accordion-header .acc-title { font-weight: 700; }
+.accordion-header .acc-actions { display:flex; align-items:center; gap:0.5rem; }
+.accordion-header .acc-dismiss { background: transparent; border: 1px solid rgba(255,255,255,0.04); color: #cfe8ff; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer; }
+.accordion-header .acc-chevron { transition: transform 240ms ease; }
+
+.accordion-content { max-height: 0; overflow: hidden; transition: max-height 340ms cubic-bezier(.2,.9,.2,1), padding 240ms ease; padding: 0 1rem; }
+.accordion[aria-open="true"] .accordion-content { padding: 0.6rem 1rem 1rem 1rem; max-height: 320px; }
+.accordion[aria-open="true"] .acc-chevron { transform: rotate(180deg); }
+
+.acc-steps { margin: 0; padding-left: 1.25rem; color: #dbeafe; }
+
+/* Make the accordion more mobile-friendly */
+@media (max-width: 560px) {
+    .accordion {
+        max-width: 100%;
+        border-radius: 8px;
+        padding: 0; /* reduce extra card padding on tiny screens */
+    }
+
+    .accordion-header {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .accordion-header .acc-title { 
+        font-size: 0.95rem;
+    }
+
+    /* The content can be taller but should scroll inside the accordion area */
+    .accordion[aria-open="true"] .accordion-content {
+        max-height: 240px; /* smaller max on mobile */
+        padding: 0.5rem 0.75rem 0.75rem 0.75rem;
+        overflow: auto; /* allow inner scrolling for long content */
+        -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    }
+
+    .acc-steps {
+        font-size: 0.95rem;
+        padding-left: 1rem;
+    }
+
+    .acc-note { font-size: 0.88rem; }
+
+    /* Ensure the chevron remains visible and doesn't crowd content */
+    .accordion-header .acc-actions { gap: 0.35rem; }
+}
+.acc-steps li { margin: 0.5rem 0; padding: 0.45rem; border-radius: 6px; transition: background 160ms ease, box-shadow 160ms ease; }
+.acc-steps li:hover { background: rgba(124,58,237,0.08); box-shadow: 0 6px 16px rgba(2,6,23,0.45); cursor: pointer; }
+.acc-steps li strong { color: #e6eef8; }
+.acc-note { color: #9fb8d9; font-size: 0.9rem; margin-top: 0.5rem; }
+
+/* Highlighted control when a step is hovered/active */
+.highlight-target { box-shadow: 0 10px 30px rgba(124,58,237,0.18) !important; transform: translateY(-4px) !important; }

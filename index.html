@@ -8,33 +8,111 @@
     <!-- Add a description for search engines -->
     <meta name="description" content="Diwali Lights - A simple web app to create colorful boxes.">
     <!-- Add keywords for search engines -->
-    <meta name="keywords" content="random, color, change, boxes, web app">
+    <meta name="keywords" content="random, color, change, boxes, web app, Biplab Sharma, Tech VFX King, Diwali Lights">
     <!-- Add author for search engines -->
-    <meta name="author" content="Biplab Sharma, Tech VFX King">
+    <meta name="author" content="Biplab Sharma (Tech VFX King)">
     <title>Diwali Lights</title>
     <!-- Link to the Tab bar Icon. -->
-    <link rel="shortcut icon" href="./rgb.png" type="image/x-icon">
+    <link rel="shortcut icon" href="./rgb_MainLogo.png" type="image/x-icon">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Diwali Lights — Shine colorful lights in your browser">
+    <meta property="og:description"
+        content="Diwali Lights is a small web app to create colorful boxes on screen to celebrate Diwali and bring a little joy to developers working late.">
+    <meta property="og:image" content="./rgb_MainLogo.png">
+    <meta property="og:url" content="https://techvfxking.github.io/random-color-v1/">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Diwali Lights — Shine colorful lights in your browser">
+    <meta name="twitter:description"
+        content="Create colorful boxes and light up your screen. A tiny Diwali celebration for developers.">
+    <meta name="twitter:image" content="./rgb_MainLogo.png">
     <!-- Link to the stylesheet. This file contains all page styling. -->
     <link rel="stylesheet" href="./styles.css">
+    <!-- Structured data (JSON-LD) for SEO and rich previews -->
+    <link rel="canonical" href="https://techvfxking.github.io/random-color-v1/">
+    <meta name="theme-color" content="#071027">
+    <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Diwali Lights",
+                "alternateName": ["Biplab Sharma", "Tech VFX King"],
+                "url": "https://techvfxking.github.io/random-color-v1/",
+                "description": "A tiny web app to celebrate Diwali by creating colorful boxes and lighting up the screen.",
+                "publisher": {
+                    "@type": "Person",
+                    "name": "Biplab Sharma",
+                    "alternateName": "Tech VFX King"
+                }
+            }
+            </script>
 </head>
 
 <body>
     <!-- Main area: everything on the page is inside this <main> -->
     <main class="container flex-col">
 
+        <!-- Brand hero: logo + title + small marketing message -->
+        <header class="hero">
+            <img src="./rgb_MainLogo.png" alt="Diwali Lights logo" class="hero-logo" />
+            <div class="hero-text">
+                <h1>Diwali Lights</h1>
+                <p class="tagline">Shine colorful lights in your browser — a small Diwali treat for developers.</p>
+            </div>
+        </header>
+
+
         <!-- Input card: the user types the number of boxes and the timer here -->
         <section class="input-container flex-col">
+            <!-- Instruction accordion (appears at top of input card) -->
+            <div id="instructions-accordion" class="accordion" aria-labelledby="instructions-header" aria-open="true">
+                <button class="accordion-header" id="instructions-header" aria-expanded="true">
+                    <span class="acc-title">Quick Start — How to use Diwali Lights</span>
+                    <span class="acc-actions">
+                        <svg class="acc-chevron" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#cfe8ff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                </button>
+                <div class="accordion-content" role="region">
+                    <ol class="acc-steps">
+                        <li data-target="#inp1"><strong>Enter Box Count</strong> — type how many boxes you want in the box count field.</li>
+                        <li data-target="#btn"><strong>Click Submit</strong> — this creates the boxes in the grid (skeleton shows briefly).</li>
+                        <li data-target="#inp2"><strong>Adjust Timer</strong> — use the slider to set seconds between color changes; changing while running updates speed immediately.</li>
+                        <li data-target="#play-pause"><strong>Play / Pause</strong> — click the play icon to start the lights; the same button pauses.</li>
+                    </ol>
+                    <p class="acc-note">Hover a step to highlight the relevant control. Click a step to focus it.</p>
+                </div>
+            </div>
             <!-- Label tells the user what to type. Not linked to input for simplicity. -->
             <label>Enter Box Count</label>
             <!-- Input for how many boxes to create. Use numbers only. -->
             <input id="inp1" type="number" inputmode="numeric" />
 
-            <!-- Label for timer input (seconds between color changes). -->
-            <label>Enter Timner Count</label>
-            <input id="inp2" type="number" inputmode="numeric">
+
+            <!-- Label and slider for timer (seconds between color changes) -->
+            <label for="inp2-slider">Timer (seconds between color changes):
+                <span id="timer-value" style="font-weight:600; color:#7c3aed; margin-left:0.5em;">1.0s</span>
+            </label>
+            <input id="inp2" type="range" min="0.1" max="5" step="0.1" value="0.1" aria-valuenow="0.1" aria-valuemin="0.1"
+                aria-valuemax="5" />
 
             <!-- Submit button triggers the script to create boxes. -->
-            <button id="btn" type="button">Submit</button>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <button id="btn" type="button">Submit</button>
+                <!-- Single Play/Pause toggle button placed beside Submit as requested -->
+                <button id="play-pause" class="play-pause" type="button" aria-pressed="false" aria-label="Play" data-playing="false">
+                    <svg id="play-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Play path (default visible) -->
+                        <path id="icon-play" d="M5 3v18l15-9L5 3z" fill="#ef4444" />
+                        <!-- Pause group (hidden by JS when not active) -->
+                        <g id="icon-pause" style="display:none;" fill="#fff">
+                            <rect x="6" y="4" width="4" height="16" rx="1" />
+                            <rect x="14" y="4" width="4" height="16" rx="1" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
         </section>
 
         <!-- Grid container: boxes are added here by scripts.js -->
@@ -42,16 +120,59 @@
             <!-- Initially empty. Script will add <div class="container-box-item"> elements here. -->
         </section>
 
-        <!-- Controls for starting/stopping the color animation -->
-        <section class="color-change">
-            <label>Change Color</label>
-            <section class="flex-col">
-                <!-- Start and Stop buttons are wired in scripts.js -->
-                <button id="start" type="button">Start Light</button>
-                <button id="stop" type="button">Stop Light</button>
-            </section>
-        </section>
+        <!-- Controls moved into the input card (Play/Pause next to Submit) -->
     </main>
+
+    <!-- Footer: mission statement, share buttons and credits -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <p class="mission"><strong>Diwali Lights</strong> — For developers who work late: brighten your screen and
+                spirit with a tiny Diwali light. Share this link directly into any of the social media platforms.</p>
+
+            <div class="share-buttons" aria-label="Share Diwali Lights">
+                <button id="share-twitter" class="share-button" aria-label="Share on Twitter">
+                    <span class="share-text">Share on Twitter</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M22.46 5.924c-.793.352-1.646.59-2.542.698a4.48 4.48 0 0 0 1.965-2.475 8.94 8.94 0 0 1-2.828 1.082A4.48 4.48 0 0 0 16.11 4c-2.48 0-4.49 2.01-4.49 4.49 0 .352.04.695.116 1.022C7.728 9.36 4.1 7.6 1.67 4.905a4.49 4.49 0 0 0-.607 2.26c0 1.56.795 2.94 2.005 3.75a4.48 4.48 0 0 1-2.034-.563v.057c0 2.18 1.55 4 3.61 4.42-.377.103-.775.158-1.186.158-.29 0-.57-.028-.844-.08.57 1.78 2.23 3.08 4.2 3.12A8.98 8.98 0 0 1 2 19.54a12.7 12.7 0 0 0 6.88 2.02c8.26 0 12.78-6.84 12.78-12.78 0-.195-.004-.39-.013-.583A9.1 9.1 0 0 0 24 4.59a8.98 8.98 0 0 1-2.54.694z"
+                            fill="#1DA1F2" />
+                    </svg>
+                </button>
+                <button id="share-facebook" class="share-button" aria-label="Share on Facebook">
+                    <span class="share-text">Share on Facebook</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.325 24h11.495v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"
+                            fill="#1877F3" />
+                        <path
+                            d="M16.671 24v-9.294h3.12l.467-3.622h-3.587v-2.313c0-1.048.293-1.763 1.797-1.763l1.918-.001v-3.24c-.334-.044-1.472-.143-2.797-.143-2.766 0-4.659 1.688-4.659 4.788v2.13H9.692v3.622h3.128V24h3.851z"
+                            fill="#fff" />
+                    </svg>
+                </button>
+                <button id="share-linkedin" class="share-button" aria-label="Share on LinkedIn">
+                    <span class="share-text">Share on LinkedIn</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20.447 20.452h-3.554v-5.569c0-1.327-.025-3.037-1.849-3.037-1.851 0-2.132 1.445-2.132 2.939v5.667H9.358V9h3.414v1.561h.049c.476-.899 1.637-1.849 3.37-1.849 3.602 0 4.267 2.37 4.267 5.455v6.285zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.119 20.452H3.554V9h3.565v11.452zM22.225 0H1.771C.792 0 0 .771 0 1.723v20.549C0 23.229.792 24 1.771 24h20.451C23.2 24 24 23.229 24 22.271V1.723C24 .771 23.2 0 22.225 0z"
+                            fill="#0077B5" />
+                    </svg>
+                </button>
+                <button id="share-copy" class="share-button" aria-label="Copy link">Copy link</button>
+            </div>
+
+            <p class="credit">Made with <span style="color:#ef476f">❤️</span> by Tech VFX King -
+                <a class="github-link" href="https://github.com/techvfxking" target="_blank" rel="noopener">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle; margin-right:6px;">
+                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.613-4.042-1.613-.546-1.387-1.333-1.757-1.333-1.757-1.089-.745.083-.73.083-.73 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.776.418-1.304.76-1.604-2.665-.305-5.467-1.332-5.467-5.93 0-1.31.467-2.381 1.235-3.221-.135-.304-.54-1.526.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.045.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.65.24 2.872.12 3.176.77.84 1.23 1.911 1.23 3.221 0 4.61-2.805 5.625-5.475 5.92.43.37.81 1.096.81 2.21 0 1.595-.015 2.88-.015 3.27 0 .315.21.69.825.57C20.565 22.092 24 17.593 24 12.297c0-6.627-5.373-12-12-12"/>
+                    </svg>
+                    <span class="github-username">techvfxking</span>
+                </a>
+            </p>
+        </div>
+    </footer>
 
     <!-- Link to the JavaScript file that powers the interactions -->
     <script src="./scripts.js"></script>
