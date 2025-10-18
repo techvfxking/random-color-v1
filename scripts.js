@@ -1,29 +1,51 @@
+/**
+ * scripts.js
+ * ============
+ * A compact, well-documented controller for the Diwali Lights demo.
+ * Responsibilities:
+ *  - Render a responsive virtualized grid of colored boxes
+ *  - Provide UI wiring for creating boxes, starting/stopping per-box color intervals
+ *  - Support a range slider to control animation speed and restart running intervals
+ *  - Expose a small instruction accordion that highlights controls on hover/click
+ *
+ * Notes on structure and invariants:
+ *  - `boxContainer` is the single authoritative DOM container used for the grid.
+ *  - Intervals are created per visible DOM child; we track ids in `intervalvalue` and
+ *    always call `clearAllIntervals()` before starting new ones to avoid duplicates.
+ *  - Grid layout (columns) is computed from CSS when possible via `getGridCols()` so
+ *    the JS matches the visual layout produced by `styles.css` media queries.
+ *
+ * Error modes and edge cases handled:
+ *  - Invalid or negative box counts are rejected with an alert.
+ *  - Very large box counts are capped with a MAX (300) and require user confirmation.
+ *  - Timer values below 0.1s are floored to a sensible minimum (100ms) to avoid thrashing.
+ *
+ * Success criteria:
+ *  - Calling `onSubmit()` with a valid positive integer creates a stable, scrollable grid.
+ *  - `onStartColor()` begins per-box color changes; `onStopColor()` stops them.
+ *  - Adjusting the slider while running changes the speed with a brief loader and no visual tearing.
+ */
+
 // store interval ids so we can clear them later (when stopping or re-creating boxes)
-// Why: setInterval returns an id number. We keep those ids so clearInterval(id) can stop the timer.
-// Impact: prevents timers from running forever when the user regenerates boxes or navigates away.
-// Example: intervalvalue = [13, 14] means two timers are running and we can stop both.
+// Each entry is the numeric id returned by setInterval.
+// We always clear these via clearAllIntervals() before creating new intervals.
 let intervalvalue = [];
 
 // id for a pending render timeout — used to avoid race conditions when user submits fast
-// Why: when user clicks Submit multiple times quickly, older slow render operations could
-// overwrite newer renders. We store the timeout id so we can cancel it before starting a new one.
-// Impact: keeps the displayed grid consistent with the user's last action.
-// Example: renderTimeoutId = 42 means a pending call to setTimeout is scheduled and can be cleared.
+// When a user submits repeatedly we cancel the previous scheduled render to ensure
+// the most recent submit wins.
 let renderTimeoutId = null;
 
 // user-friendly error message prefix used for alerts
-// Why: we reuse the same message format in multiple places to keep messaging consistent.
-// Impact: a single edit to this string updates all validation alerts.
-// Example: alert(`${errorMessage} abc`) -> 'Please enter a valid Input... and you have entered: abc'
+// Centralized message makes it simple to tweak wording for all validation errors.
 const errorMessage = "Please enter a valid Input in number which has to be greater than 0 or 0 and you have entered: ";
 
-// grab the main container where box elements will be added
-// Why: we need a DOM reference to append/remove box elements later.
-// Impact: if the id is wrong, subsequent DOM ops will fail (null reference error).
-// Tip: keep the id in HTML synchronized with this string.
+// DOM reference to the grid container where tiles are created/removed.
+// The rest of the script assumes this element exists in the page.
 const boxContainer = document.getElementById('container-box-elem');
 
 // Instruction shown to the user on page load (and once per session)
+// Instruction text (kept for completeness; the UI now uses an accordion instead of an alert)
 let instructionsShown = false;
 const START_INSTRUCTIONS = 'How to use Diwali Lights - Step by step:\n\n'
     + '1) Enter the number of boxes you want in the "Boxes" field.\n'
@@ -32,18 +54,21 @@ const START_INSTRUCTIONS = 'How to use Diwali Lights - Step by step:\n\n'
     + '4) Click Start to begin the color animation. Click Stop to pause.\n\n'
     + 'This message will appear on page load. Press OK to continue.';
 
-// --- Virtual scroll state ---
-let virtualBoxCount = 0;
-let virtualScrollTop = 0;
-let virtualBoxHeight = 120; // px, matches .container-box-item
-let virtualGridCols = 1;
-let virtualVisibleRows = 1;
-let virtualOverscan = 2; // render extra rows for smoothness
+// --- Virtual scroll / rendering state ---
+// These values are updated when rendering so the virtual viewport renders only
+// a subset of tiles and keeps scroll height accurate.
+let virtualBoxCount = 0;      // total number of tiles requested by user
+let virtualScrollTop = 0;     // last seen scrollTop (not strictly required yet)
+let virtualBoxHeight = 120;   // tile height (px) — kept in sync with CSS where possible
+let virtualGridCols = 1;      // current number of CSS grid columns
+let virtualVisibleRows = 1;   // how many rows fit in the viewport (plus overscan)
+let virtualOverscan = 2;      // extra rows rendered above/below for smoother scrolling
 
 function getGridCols() {
     // Prefer reading the CSS grid definition so JS matches the visual columns.
     // Use computed style's gridTemplateColumns to count explicit columns.
     try {
+        // Read the computed CSS grid definition so the JS column count matches visual layout.
         const computed = window.getComputedStyle(boxContainer).gridTemplateColumns;
         if (computed) {
             // computed is like "64px 64px 64px ..." — count tokens
@@ -51,7 +76,7 @@ function getGridCols() {
             if (cols && Number.isFinite(cols)) return Math.max(1, cols);
         }
     } catch (e) {
-        // fall through to fallback
+        // If anything goes wrong (missing element or older browser), fall back to a width estimate
     }
     // Fallback: estimate columns based on container width and a reasonable min width
     const width = boxContainer.offsetWidth || 1100;
@@ -66,27 +91,36 @@ function getBoxHeight() {
 }
 
 function renderVirtualGrid(boxCount) {
+    // Update state for rendering
     virtualBoxCount = boxCount;
     virtualGridCols = getGridCols();
     virtualBoxHeight = getBoxHeight();
+
+    // How many tile-rows are visible in the current container height (plus overscan)
     const containerHeight = boxContainer.clientHeight || 400;
     virtualVisibleRows = Math.ceil(containerHeight / virtualBoxHeight) + virtualOverscan;
+
+    // Compute which tiles to render based on scroll position
     const scrollTop = boxContainer.scrollTop;
     const firstRow = Math.max(0, Math.floor(scrollTop / virtualBoxHeight) - virtualOverscan);
     const lastRow = Math.min(Math.ceil(boxCount / virtualGridCols), firstRow + virtualVisibleRows);
     const startIdx = firstRow * virtualGridCols;
     const endIdx = Math.min(boxCount, lastRow * virtualGridCols);
 
-    // Render only visible boxes
+    // Remove previous children and create only the visible tile elements.
+    // This keeps DOM size small and improves performance for large counts.
     boxContainer.innerHTML = '';
     for (let i = startIdx; i < endIdx; i++) {
         const div = document.createElement('div');
         div.className = 'container-box-item';
+        // Simple label shown in the demo; in a real app this would be richer content.
         div.textContent = `Div ${i + 1}`;
         div.style.background = getRandomColor();
         boxContainer.appendChild(div);
     }
-    // Set grid template rows to keep scroll height correct
+
+    // Ensure the grid reports the correct total scroll height by setting template rows
+    // to the number of logical rows (this keeps the scrollbar proportional to total items).
     const totalRows = Math.ceil(boxCount / virtualGridCols);
     boxContainer.style.gridTemplateRows = `repeat(${totalRows}, ${virtualBoxHeight}px)`;
 }
@@ -95,13 +129,19 @@ function onVirtualScroll() {
     renderVirtualGrid(virtualBoxCount);
 }
 
+// Keep the virtual render in sync with user interactions
 boxContainer.addEventListener('scroll', onVirtualScroll);
 window.addEventListener('resize', () => renderVirtualGrid(virtualBoxCount));
 
 // Show usage instructions on page load (only once per session)
 // Show the instruction accordion on first load (persist choice in sessionStorage)
+/**
+ * On load: set accordion open state and wire UI interactions.
+ * - Accordion header toggles open/closed (no persistence)
+ * - Steps highlight and focus their associated control when hovered/clicked
+ */
 window.addEventListener('load', () => {
-    // Always show the accordion expanded by default. It is collapsible via header click
+    // Always open accordion by default; user can collapse via header
     const acc = document.getElementById('instructions-accordion');
     if (acc) {
         acc.setAttribute('aria-open', 'true');
@@ -109,7 +149,7 @@ window.addEventListener('load', () => {
         if (hdr) hdr.setAttribute('aria-expanded', 'true');
     }
 
-    // accordion header toggle (collapsible behavior)
+    // Accordion header click toggles the visible content area.
     const header = document.querySelector('#instructions-accordion .accordion-header');
     if (header) {
         header.addEventListener('click', function () {
@@ -120,7 +160,7 @@ window.addEventListener('load', () => {
         });
     }
 
-    // highlight controls when hovering or clicking steps
+    // Hover/click behavior for steps: highlight the related control (if present) and focus on click.
     const steps = document.querySelectorAll('#instructions-accordion .acc-steps li');
     steps.forEach(step => {
         const targetSel = step.getAttribute('data-target');
@@ -133,8 +173,8 @@ window.addEventListener('load', () => {
         });
         step.addEventListener('click', () => {
             if (target) {
+                // Focus the control and provide a short visual pulse to draw attention.
                 target.focus({preventScroll:false});
-                // briefly pulse the control
                 target.classList.add('highlight-target');
                 setTimeout(() => target.classList.remove('highlight-target'), 900);
             }
